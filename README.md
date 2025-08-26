@@ -40,14 +40,24 @@ KIS_MOCK_MODE=true  # Set to false for production
 ### 3. Basic Usage
 
 ```python
+import os
 from korea_investment_trading import KISClient
 
-# Initialize client
+# Initialize client with environment variables (SECURE)
 client = KISClient(
-    app_key="your_app_key",
-    app_secret="your_app_secret",
-    account_number="your_account",
+    app_key=os.getenv("KIS_APP_KEY"),
+    app_secret=os.getenv("KIS_APP_SECRET"), 
+    account_number=os.getenv("KIS_ACCOUNT_NUMBER"),
     is_mock=True  # Safe testing mode
+)
+
+# Alternative: Use settings module
+from config.settings import settings
+client = KISClient(
+    app_key=settings.api.app_key,
+    app_secret=settings.api.app_secret,
+    account_number=settings.api.account_number,
+    is_mock=settings.api.is_mock
 )
 
 # Authenticate
@@ -73,13 +83,18 @@ result = client.buy_stock(
 
 ```python
 import asyncio
+import os
 from korea_investment_trading import KISWebSocket
 
 async def price_callback(data):
     print(f"Price update: {data['symbol']} = {data['price']} KRW")
 
-# Initialize WebSocket
-ws = KISWebSocket(app_key="your_key", app_secret="your_secret")
+# Initialize WebSocket with environment variables (SECURE)
+ws = KISWebSocket(
+    app_key=os.getenv("KIS_APP_KEY"),
+    app_secret=os.getenv("KIS_APP_SECRET"),
+    is_mock=True
+)
 
 # Connect and subscribe
 await ws.connect()
@@ -219,6 +234,8 @@ mypy src/
 
 ## Important Notes
 
+⚠️ **Security First**: Never hardcode API keys in your code. Always use environment variables.
+
 ⚠️ **Mock Mode**: Always test with `is_mock=True` before live trading
 
 ⚠️ **API Limits**: KIS API has rate limits (20 requests/second)
@@ -226,6 +243,17 @@ mypy src/
 ⚠️ **Risk**: Algorithmic trading involves financial risk. Test thoroughly.
 
 ⚠️ **Compliance**: Ensure compliance with Korean financial regulations
+
+## Security
+
+🔐 **READ FIRST**: [Security Guidelines](SECURITY.md) - Essential security practices for API key protection
+
+**Quick Security Checklist:**
+- ✅ Use environment variables for API keys
+- ✅ Never commit `.env` files to Git  
+- ✅ Use Mock mode for development/testing
+- ✅ Regularly rotate API keys
+- ✅ Monitor for unauthorized access
 
 ## Support
 
